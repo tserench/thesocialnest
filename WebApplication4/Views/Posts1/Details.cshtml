@@ -1,0 +1,110 @@
+﻿@model WebApplication4.Models.Post
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<article class="post vt-post">
+    <div></div>
+    <div></div>
+    <div></div>
+    <div class="row">
+        
+        <div class="bg-primary col-xs-12 col-sm-5 col-md-5 col-lg-6 author-info author-info-2" style="padding:20px" width=auto;>
+            <div class="row">
+                <div class="info col-xs-9 col-sm-9 col-md-9 col-lg-9">
+                    @{var image = Model.AspNetUser.Image + ".png";
+                        string name = Model.AspNetUser.FirstName + " " + Model.AspNetUser.LastName; }
+                    <img src="~/Content/Images/ProfilePics/@image" alt="profile picture" height="50">
+
+                    <h4 class="md-heading">@Html.ActionLink(name, "Index", "Profile", new { id = ViewBag.postUserId }, null)</h4>
+                    <h5 class="md-heading">Posted on: @Model.Time</h5>
+                    <h6 class="md-heading">Post visibility: @Model.Visibility</h6>
+                </div>
+                <div class="col-xs-12 col-sm-7 col-md-7 col-lg-8">
+                    <dev class=" row">
+
+                    </dev>
+                    <dev class="bg-success row caption">
+                        <div>Post Content<br> @Model.Content</div>
+                    </dev>
+                </div>
+                <div class="info col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                    <p>@Html.ActionLink("Reacts:", "Details", "PostReacts", new { id = Model.PostId }, null)</p>
+                    <p>@Model.PostReacts.Count()</p>
+                    <hr />
+                    <p>Comments:</p>
+                    <p>
+                        @foreach (var item in Model.PostComments)
+                        {
+                            <div class="comment">
+                                <div class="comment-head">
+                                    <div>@Html.DisplayFor(modelItem => item.AspNetUser.Email)</div>
+                                    @if (item.UserId == ViewBag.currentUserId)
+                                    {
+                                        <div class="delete-link">@Html.ActionLink("Delete Your Comment", "Delete", new { id = item.Id, postId = ViewBag.currentPostId, userId = ViewBag.currentUserId })</div>
+                                    }
+                                </div>
+
+                                <div class="comment-content">@Html.DisplayFor(modelItem => item.Comment)</div>
+
+
+                            </div>
+                        }
+                    </p>
+
+                </div>
+
+                @{
+                    if (ViewBag.myId == ViewBag.postUserId) //My post
+                    {
+                        <div class="btn-group bottom-left">
+                            <a class="btn  btn-sm glyphicon glyphicon-comment"
+                               href="@Url.Action("Index", "PostComments", new { id = Model.PostId, userId = ViewBag.myId })"></a>
+                            <a class="btn  btn-sm glyphicon glyphicon-edit"
+                               href="@Url.Action("Edit", "Posts1", new { id = Model.PostId })"></a>
+                            <a class="btn  btn-sm glyphicon glyphicon-trash"
+                               href="@Url.Action("Delete", "Posts1", new { id = Model.PostId })"></a>
+                        </div>
+                    }
+                    else //Someone's post
+                    {
+                        <div class="btn-group bottom-left">
+                            @{
+                                var reactedPrev = Model.PostReacts.SingleOrDefault(m => m.PostId == Model.PostId && m.UserId == ViewBag.myId);
+                                string like = (reactedPrev != null && reactedPrev.React == true) ? "active" : "";
+                                string dislike = (reactedPrev != null && reactedPrev.React == false) ? "active" : "";
+                                <a class="btn  btn-sm glyphicon glyphicon-thumbs-up @like"
+                                   href="@Url.Action("Create", "PostReacts", new { postId = Model.PostId, userId = ViewBag.myId, react = true })">
+                                    @if (like != "")
+                                    {<span>Liked</span>}
+                                </a>
+                                <a class="btn  btn-sm glyphicon glyphicon-thumbs-down @dislike"
+                                   href="@Url.Action("Create", "PostReacts", new { postId = Model.PostId, userId = ViewBag.myId, react = false })">
+                                    @if (dislike != "")
+                                    {<span>Disliked</span>}
+                                </a>
+                                //TODO: Recorrect call for comment page.
+                                <a class="btn  btn-sm glyphicon glyphicon-comment"
+                                   href="@Url.Action("Index", "PostComments", new { id = Model.PostId, userId = ViewBag.myId })">
+
+                                </a>
+
+
+                            }
+                        </div>
+                    }
+                }
+
+
+            </div>
+           
+        </div>
+
+</div>
+</article>
+<p>
+    
+    @*@Html.ActionLink("Back to Home", "Index", "Home")*@
+</p>

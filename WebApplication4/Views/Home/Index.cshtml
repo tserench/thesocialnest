@@ -1,0 +1,88 @@
+﻿
+@{
+    ViewBag.Title = "Home Page";
+
+}
+<style>
+    .column {
+        float: left;
+        padding: 10px;
+       
+    }
+
+    .left {
+        width: 10%;
+    }
+    .right  {
+        width: 20%;
+    }
+
+    .middle {
+        width: 60%;
+    }
+
+    /* Clear floats after the columns */
+    .row:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+</style>
+<div class=" col-md-12" style="position:center;text-align:center">
+    <h1>Welcome</h1>
+</div>
+<div class="column left" >
+    @Html.ActionLink("Profile ", "Index", "Profile", new { }, new { @class = "btn btn-primary" })<br>
+    @Html.ActionLink("New Post", "Create", "Posts1", new { }, new { @class = "btn btn-primary" })
+</div>
+
+<div class="column middle" >
+    <div class="row center-block">
+
+        <!--Retrieve posts in reverse order-->
+        @{
+            Stack<int> pid = new Stack<int>();
+            List<string> friendsId = new List<string>();
+            foreach (var friend in ViewBag.myFriends)
+            {
+                friendsId.Add(friend);
+            }
+            foreach (var post in Model) //push postId to stack if mine/friend/public
+            {
+                if (post.UserId == ViewBag.myId || post.Visibility == "public" || (friendsId.Contains(post.UserId) && post.Visibility == "friendOnly")) //check if my post || public || poster is my friend
+                {
+                    pid.Push(post.PostId);
+                }
+            }
+            if (pid.Count() > 0)
+            {
+                <hr style="border:0px" />
+                while (pid.Count > 0)
+                {
+                    Html.RenderAction("Details", "Posts1", new { id = pid.Pop(), myId = ViewBag.myId });
+                    <hr />
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="10">
+                        <div class="container-fluid bg-2 text-center">
+                            <h2>There is no posts to show </h2>
+                        </div>
+                    </td>
+                </tr>
+            }
+        }
+    </div>
+</div>
+<div class="column right" >
+
+    <h4>ABOUT US</h4>
+    <img src="~/Content/Images/illustrations/undraw_fun_moments_2vha.png" width="250" ,height="190" />
+    <P>
+        This demo site is prepared and developed for NIT3002 "Applied Project 2" and is not intended to go public and is completed by group number 3.
+        Group members:
+        Tserenchimed Tsogbadrakh(4663996)
+    </P>
+</div>
